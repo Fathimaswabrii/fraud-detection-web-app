@@ -2,7 +2,6 @@
 
 A machine learning–powered web application that detects fraudulent credit card transactions using a trained classification model and a Flask-based backend.
 
-The project demonstrates how fraud detection systems work when sensitive transaction data is anonymized using PCA transformation.
 
 ---
 
