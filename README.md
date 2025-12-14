@@ -3,7 +3,7 @@
 A machine learning–powered web application that detects fraudulent credit card transactions using a trained classification model and a Flask-based backend.
 
 
----
+
 
 ## 🔍 Project Overview
 
@@ -14,7 +14,7 @@ Instead, the system **simulates transaction behavior internally**, while allowin
 
 This approach keeps the UI realistic and conceptually correct.
 
----
+
 
 ## ⚙️ Tech Stack
 
@@ -25,7 +25,7 @@ This approach keeps the UI realistic and conceptually correct.
 - **Joblib**
 - **HTML, CSS, JavaScript**
 
----
+
 
 ## 🧠 Machine Learning Model
 
@@ -39,7 +39,7 @@ This approach keeps the UI realistic and conceptually correct.
 
 The model is trained on a PCA-transformed credit card transactions dataset.
 
----
+
 
 ## 🖥️ Application Workflow
 
@@ -51,7 +51,7 @@ The model is trained on a PCA-transformed credit card transactions dataset.
    - 🚨 Fraud Detected
 5. Fraud probability and transaction history are updated in real time
 
----
+
 
 ## 🚀 How to Run the Project
 
