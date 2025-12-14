@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | Fraud Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Transaction History</h1>
+            </div>
+            <nav>
+                <a href="/"><i class="fas fa-home"></i> Home</a>
+                <a href="/history" class="active"><i class="fas fa-history"></i> Transaction History</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="history-header">
+                <h2><i class="fas fa-list-alt"></i> All Transactions</h2>
+                <div class="history-actions">
+                    <button id="clear-history" class="btn-clear">
+                        <i class="fas fa-trash-alt"></i> Clear History
+                    </button>
+                    <a href="/" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Detection
+                    </a>
+                </div>
+            </div>
+            
+            {% if transactions %}
+            <div class="table-container">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Amount</th>
+                            <th>Result</th>
+                            <th>Probability</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions|reverse %}
+                        <tr class="{% if transaction.is_fraud %}fraud-row{% else %}legitimate-row{% endif %}">
+                            <td>#{{ transaction.id }}</td>
+                            <td>{{ transaction.timestamp }}</td>
+                            <td>${{ "%.2f"|format(transaction.Amount) }}</td>
+                            <td>
+                                <span class="status-badge {% if transaction.is_fraud %}fraud-badge{% else %}legitimate-badge{% endif %}">
+                                    {% if transaction.is_fraud %}
+                                    <i class="fas fa-exclamation-triangle"></i> Fraud
+                                    {% else %}
+                                    <i class="fas fa-check-circle"></i> Legitimate
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>{{ transaction.fraud_probability }}%</td>
+                            <td>
+                               <div class="probability-indicator">
+                                 <div class="indicator-bar" data-width="{{ transaction.fraud_probability }}"></div>
+                               </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="history-stats">
+                <div class="stat-card">
+                    <h3>Total Transactions</h3>
+                    <p class="stat-number">{{ transactions|length }}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Fraudulent</h3>
+                    <p class="stat-number fraud-stat">
+                        {{ transactions|selectattr("is_fraud")|list|length }}
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3>Legitimate</h3>
+                    <p class="stat-number legitimate-stat">
+                        {{ transactions|rejectattr("is_fraud")|list|length }}
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <h3>Fraud Rate</h3>
+                    <p class="stat-number">
+                        {% if transactions|length > 0 %}
+                            {{ "%.2f"|format((transactions|selectattr("is_fraud")|list|length / transactions|length) * 100) }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-history fa-3x"></i>
+                <h3>No Transactions Yet</h3>
+                <p>Perform some fraud detection checks to see transaction history here.</p>
+                <a href="/" class="btn-submit">
+                    <i class="fas fa-bolt"></i> Go to Fraud Detection
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.querySelectorAll(".indicator-bar").forEach(bar => {
+            bar.style.width = bar.dataset.width + "%";
+        });
+        
+        // Clear history functionality
+        document.getElementById('clear-history').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all transaction history? This action cannot be undone.')) {
+                fetch('/clear_history', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Transaction history cleared successfully!');
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to clear history');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
